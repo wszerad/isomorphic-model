@@ -23,7 +23,7 @@ class RESTModel extends Basic {
 		return this._url;
 	}
 
-	static $handle(parentRouter) {
+	static handle(parentRouter) {
 		var router = express.Router();
 		parentRouter.use(utils.urlFormatter(this.prototype.schema().url), middleware(this), router);
 

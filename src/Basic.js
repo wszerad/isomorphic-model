@@ -35,7 +35,7 @@ class Model {
 
 		Object.defineProperties(this, {
 			_id: {
-				value: schema.title || schema.id
+				value: schema.id || schema.title
 			},
 			_backups: {
 				value: []
@@ -62,6 +62,10 @@ class Model {
 		} else {
 			_.merge(this, skeleton, data || {});
 		}
+		
+		if(opt.cast) {
+			this.errors = this.$validate();
+		}
 	}
 	
 	options() {
@@ -85,6 +89,16 @@ class Model {
 
 		if(this._backups.length > this._opt.backupsLevels)
 			this._backups.pop();
+	}
+
+	$restore(num) {
+		num = num || 0;
+
+		if(num < 0) {
+			num += this._backups.length;
+		}
+
+		_.merge(this, this._backups.splice(0, num + 1));
 	}
 
 	$validate() {
@@ -157,14 +171,6 @@ class Model {
 		}
 
 		return this;
-	}
-
-	static cast(schema, data) {
-		var errors = Model.validate(schema, data);
-
-		var model = new this.constructor(data);
-		model.errors = errors;
-		return model;
 	}
 
 	static validate(schema, data) {
